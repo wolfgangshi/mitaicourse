@@ -35,11 +35,35 @@ def cube(x):
     return math.pow(x,3)
 
 def factorial(x):
-    raise NotImplementedError
+    if (not type(x) == int) or x < 0:
+        raise ValueError
+
+    if x == 0:
+        return 1
+
+    fac = x
+    while (x > 1):
+        x1 = x - 1
+        fac = x1 * fac
+        x -= 1
+    return fac
 
 def count_pattern(pattern, lst):
-    raise NotImplementedError
+    count = 0
+    pattern_length = len(pattern)
+    while (pattern_length <= len(lst) ):
+        if check_match(pattern, lst[:pattern_length]):
+            count += 1
+        lst = lst[1:]
+    return count
 
+def check_match(pattern, target_lst):
+    for i in xrange(len(pattern)):
+        if pattern[i] == target_lst[i]:
+            pass
+        else:
+            return False
+    return True
 
 # Problem 2.2: Expression depth
 
