@@ -22,7 +22,6 @@
 #   2. Python v2.5 or Python v2.6
 #   3. Python v3.0
 # Fill in your answer in the next line of code ("1", "2", or "3"):
-import math
 
 ANSWER_1 = '2'
 
@@ -32,6 +31,7 @@ ANSWER_1 = '2'
 # Problem 2.1: Warm-Up Stretch
 
 def cube(x):
+    import math
     return math.pow(x,3)
 
 def factorial(x):
@@ -67,8 +67,37 @@ def check_match(pattern, target_lst):
 
 # Problem 2.2: Expression depth
 
+class Node(object):
+    def __init__(self, expr, depth):
+        self.__depth = depth
+        self.__expr = expr
+
+    def depth(self):
+        return self.__depth
+
+    def expr(self):
+        return self.__expr
+
 def depth(expr):
-    raise NotImplementedError
+    current_max_depth = 0
+    import collections
+    sub_exprs = collections.deque([])
+    sub_exprs.appendleft(Node(expr, 0))
+    while 1:
+        try:
+            node = sub_exprs.pop()
+
+            ## update current_max_depth
+            if node.depth() > current_max_depth:
+                current_max_depth = node.depth()
+
+            if isinstance(node.expr(), (list, tuple)):
+                ## expand the expression if it still is a compound expression
+                for expr in node.expr():
+                    sub_exprs.appendleft(Node(expr, node.depth()+1))
+
+        except IndexError:
+            return current_max_depth
 
 
 # Problem 2.3: Tree indexing
