@@ -81,8 +81,7 @@ class Node(object):
 def depth(expr):
     current_max_depth = 0
     import collections
-    sub_exprs = collections.deque([])
-    sub_exprs.appendleft(Node(expr, 0))
+    sub_exprs = collections.deque([Node(expr, 0)])
     while 1:
         try:
             node = sub_exprs.pop()
@@ -103,7 +102,10 @@ def depth(expr):
 # Problem 2.3: Tree indexing
 
 def tree_ref(tree, index):
-    raise NotImplementedError
+    for i in index:
+        tree = tree[i]
+
+    return tree
 
 
 # Section 3: Symbolic algebra
