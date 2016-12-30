@@ -118,7 +118,7 @@ def count_pattern_3_getargs():
 def count_pattern_3_testanswer(ans, original_val = None):
     if original_val == None:
         original_val = answers['count_pattern_3_random']
-        
+
     return ( len(original_val[1])/5 == ans )
 
 count_pattern_3_expected = "an integer between 1 and 10 (this test is randomly generated)"
@@ -188,13 +188,13 @@ def tree_ref_3_getargs():
 def tree_ref_3_testanswer(ans, original_val = None):
     if original_val == None:
         original_val = answers['tree_ref_3_random']
-        
+
     return ( ans == sample_tree[original_val[1][0]] )
 
 tree_ref_3_expected = "(this test is randomly generated)"
 
 
-    
+
 from algebra import Sum, Product, Expression
 
 def is_flat(lst, allowed_nesting = 2):
@@ -227,7 +227,7 @@ def is_flat(lst, allowed_nesting = 2):
     else:
         return False
 
-    
+
 def is_list(lst):
     return isinstance(lst, (list, tuple))
 
@@ -258,8 +258,8 @@ def evaluator(lst, context = {}):
                 retVal += elt
 #        print retVal
         return retVal
-    
-    elif isinstance(lst, Product):        
+
+    elif isinstance(lst, Product):
         retVal = 1
         for elt in lst:
             if elt in context.keys():
@@ -271,9 +271,9 @@ def evaluator(lst, context = {}):
                 retVal *= elt
 
 #        print retVal
-        return retVal    
-        
-             
+        return retVal
+
+
 def distribution_1_getargs():
     return [ encode_sumprod(Sum([1, Product([3, 1])])) ]
 
@@ -282,8 +282,8 @@ def distribution_1_testanswer(ans, original_val = None):
     return ( evaluator(ans) == 4 and is_flat(ans) )
 
 distribution_1_expected = "A simplified Expression that evaluates to 4"
-             
-             
+
+
 def distribution_2_getargs():
     return [ encode_sumprod(Product([1, Sum([3, 1])])) ]
 
@@ -293,29 +293,26 @@ def distribution_2_testanswer(ans, original_val = None):
 
 distribution_2_expected = "A simplified Expression that evaluates to 4"
 
-             
+
 def distribution_3_getargs():
     return [ encode_sumprod(Product([2, Sum([3, 4])])) ]
 
 def distribution_3_testanswer(ans, original_val = None):
     ans = decode_sumprod(ans)
     return ( evaluator(ans) == 14 and is_flat(ans) )
-             
-distribution_3_expected = "A simplified Expression that evaluates to '14'"
 
-             
+distribution_3_expected = "A simplified Expression that evaluates to '14'"
 def distribution_4_getargs():
     return [ encode_sumprod(Sum([2, Product([3, Product([8, Sum([3, 12]), 5])]) ])) ]
-                          
 
 def distribution_4_testanswer(ans, original_val = None):
     ans = decode_sumprod(ans)
     return ( evaluator(ans) == 1802 and is_flat(ans) )
-             
+
 distribution_4_expected = "A flat expression that evaluates to 1802"
 
 distribution_5_random = []
-             
+
 def distribution_5_getargs():
     answers['distribution_5_random'] = [ encode_sumprod(Sum([2*random.randint(1,50), Product([3, Product([8, Sum(['x', 'y']), 5])]) ])) ]
     return answers['distribution_5_random']
@@ -326,13 +323,21 @@ def distribution_5_testanswer(ans, original_val = None):
         original_val = answers['distribution_5_random']
 
     original_val = [ decode_sumprod( original_val[0] ) ]
-        
+
     context = {'x': random.randint(1,50), 'y': random.randint(1,50)}
 
     return ( evaluator(ans, context) == evaluator(original_val[0], context) and is_flat(ans) )
 
 distribution_5_expected = "(this test is randomly generated)"
 
+def distribution_6_getargs():
+    return [ encode_sumprod(Product([Sum([1, 2]), Sum([3, 4])])) ]
+
+def distribution_6_testanswer(ans, original_val = None):
+    ans = decode_sumprod(ans)
+    return ( evaluator(ans) == 21 and is_flat(ans) )
+
+distribution_6_expected = "A simplified Expression that evaluates to '21'"
 
 # Just accept the survey answers as-is
 #def survey_answer_getargs():
@@ -373,4 +378,3 @@ def decode_sumprod(lst):
         retVal = Product(retVal)
 
     return retVal
-            
