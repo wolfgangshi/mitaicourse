@@ -177,7 +177,7 @@ def do_multiply(expr1, expr2):
         return Product([expr1, expr2]).flatten()
 
     elif isinstance(expr1, Sum) and isinstance(expr2, Sum):
-        res = Sum([Product([term1, term2]).simplify()
+        res = Sum([Product([term1, term2])
                    for term1 in expr1
                    for term2 in expr2])
         return res
