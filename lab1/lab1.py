@@ -17,7 +17,7 @@ from production import IF, AND, OR, NOT, THEN, forward_chain
 #    2. the consequent
 #    3. both
 
-ANSWER_1 = 'your answer here'
+ANSWER_1 = '2'
 
 # A rule-based system about Monty Python's "Dead Parrot" sketch
 # uses the following rules:
@@ -37,10 +37,10 @@ ANSWER_1 = 'your answer here'
 
 # Will this system produce the datum 'Polly is pining for the
 # fjords'?  Answer 'yes' or 'no'.
-ANSWER_2 = 'your answer here'
+ANSWER_2 = 'no'
 
 # Which rule contains a programming error? Answer '1' or '2'.
-ANSWER_3 = 'your answer here'
+ANSWER_3 = '2'
 
 # If you're uncertain of these answers, look in tests.py for an
 # explanation.
@@ -69,11 +69,11 @@ ANSWER_3 = 'your answer here'
 # what is asked.  After we start the system running, which rule
 # fires first?
 
-ANSWER_4 = 'your answer here'
+ANSWER_4 = '1'
 
 # Which rule fires second?
 
-ANSWER_5 = 'your answer here'
+ANSWER_5 = '0'
 
 
 # Problem 1.3.1: Poker hands
