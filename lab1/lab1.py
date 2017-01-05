@@ -1,4 +1,4 @@
-# lab1.py 
+# lab1.py
 
 #You should start here when providing the answers to Problem Set 1.
 #Follow along in the problem set, which is at:
@@ -90,18 +90,18 @@ poker_data = ( 'two-pair beats pair',
 # which poker hands beat which, transitively. For example, it
 # should be able to deduce that a three-of-a-kind beats a pair,
 # because a three-of-a-kind beats two-pair, which beats a pair.
-transitive_rule = IF( AND(), THEN() )
+transitive_rule = IF( AND('(?x) beats (?y)', '(?y) beats (?z)'), THEN('(?x) beats (?z)') )
 
 # You can test your rule like this:
-# print forward_chain([transitive_rule], poker_data)
+print forward_chain([transitive_rule], poker_data, verbose=True)
 
 # Here's some other data sets for the rule. The tester uses
 # these, so don't change them.
 TEST_RESULTS_TRANS1 = forward_chain([transitive_rule],
                                     [ 'a beats b', 'b beats c' ])
 TEST_RESULTS_TRANS2 = forward_chain([transitive_rule],
-  [ 'rock beats scissors', 
-    'scissors beats paper', 
+  [ 'rock beats scissors',
+    'scissors beats paper',
     'paper beats rock' ])
 
 
@@ -161,9 +161,9 @@ black_data = ("male sirius",
 # This should generate 14 cousin relationships, representing
 # 7 pairs of people who are cousins:
 
-black_family_cousins = [ 
-    x for x in 
-    forward_chain(family_rules, black_data, verbose=False) 
+black_family_cousins = [
+    x for x in
+    forward_chain(family_rules, black_data, verbose=False)
     if "cousin" in x ]
 
 # To see if you found them all, uncomment this line:
@@ -180,12 +180,12 @@ TEST_DATA_1 = [ 'female alice',
                 'male chuck',
                 'parent chuck alice',
                 'parent chuck bob' ]
-TEST_RESULTS_1 = forward_chain(family_rules, 
+TEST_RESULTS_1 = forward_chain(family_rules,
                                TEST_DATA_1, verbose=False)
 
-TEST_DATA_2 = [ 'female a1', 'female b1', 'female b2', 
-                'female c1', 'female c2', 'female c3', 
-                'female c4', 'female d1', 'female d2', 
+TEST_DATA_2 = [ 'female a1', 'female b1', 'female b2',
+                'female c1', 'female c2', 'female c3',
+                'female c4', 'female d1', 'female d2',
                 'female d3', 'female d4',
                 'parent a1 b1',
                 'parent a1 b2',
@@ -198,7 +198,7 @@ TEST_DATA_2 = [ 'female a1', 'female b1', 'female b2',
                 'parent c3 d3',
                 'parent c4 d4' ]
 
-TEST_RESULTS_2 = forward_chain(family_rules, 
+TEST_RESULTS_2 = forward_chain(family_rules,
                                TEST_DATA_2, verbose=False)
 
 TEST_RESULTS_6 = forward_chain(family_rules,
@@ -216,4 +216,3 @@ from backchain import backchain_to_goal_tree
 HOW_MANY_HOURS_THIS_PSET_TOOK = ''
 WHAT_I_FOUND_INTERESTING = ''
 WHAT_I_FOUND_BORING = ''
-
