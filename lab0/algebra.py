@@ -174,10 +174,13 @@ def do_multiply(expr1, expr2):
     '*' will not help you.
     """
     if isinstance(expr1, Product) and isinstance(expr2, Product):
-        return Product(list(expr1) + list(expr2))
+        return Product([expr1, expr2]).flatten()
 
     elif isinstance(expr1, Sum) and isinstance(expr2, Sum):
-        return Sum(list(expr1) + list(expr2))
+        res = Sum([Product([term1, term2])
+                   for term1 in expr1
+                   for term2 in expr2])
+        return res
 
     elif isinstance(expr1, Product) and isinstance(expr2, Sum):
         distributed_product_list = []
