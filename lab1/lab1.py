@@ -6,7 +6,7 @@
 
 # Import helper objects that provide the logical operations
 # discussed in class.
-from production import IF, AND, OR, NOT, THEN, forward_chain
+from production import IF, AND, OR, NOT, THEN, DELETE, forward_chain
 
 ## Section 1: Forward chaining ##
 
@@ -93,7 +93,7 @@ poker_data = ( 'two-pair beats pair',
 transitive_rule = IF( AND('(?x) beats (?y)', '(?y) beats (?z)'), THEN('(?x) beats (?z)') )
 
 # You can test your rule like this:
-print forward_chain([transitive_rule], poker_data, verbose=True)
+# print forward_chain([transitive_rule], poker_data, verbose=True)
 
 # Here's some other data sets for the rule. The tester uses
 # these, so don't change them.
@@ -114,7 +114,26 @@ TEST_RESULTS_TRANS2 = forward_chain([transitive_rule],
 
 # Then, put them together into a list in order, and call it
 # family_rules.
-family_rules = [ ]                    # fill me in
+rule_id = IF( OR('male (?x)', 'female (?x)'), THEN('same-id (?x) (?x)') )
+rule_brother = IF( AND('male (?x)', 'parent (?y) (?x)', 'parent (?y) (?z)', NOT( 'same-id (?x) (?z)') ), THEN ('brother (?x) (?z)', 'sibling (?x) (?z)', 'sibling (?z) (?x)') )
+rule_sister = IF( AND('female (?x)', 'parent (?y) (?x)', 'parent (?y) (?z)', NOT( 'same-id (?x) (?z)') ), THEN ('sister (?x) (?z)', 'sibling (?x) (?z)', 'sibling (?z) (?x)') )
+rule_mother = IF( AND('female (?x)', 'parent (?x) (?y)'), THEN ('mother (?x) (?y)'))
+rule_father = IF( AND('male (?x)', 'parent (?x) (?y)'), THEN ('father (?x) (?y)'))
+rule_son = IF( AND('male (?x)', 'parent (?y) (?x)'), THEN('son (?x) (?y)') )
+rule_daughter = IF( AND('female (?x)', 'parent (?y) (?x)'), THEN('daughter (?x) (?y)') )
+rule_cousin = IF( AND('parent (?p1) (?c1)', 'parent (?p2) (?c2)', 'sibling (?p1) (?p2)'), THEN('cousin (?c1) (?c2)', 'cousin (?c2) (?c1)') )
+rule_grandparent_grandchild = IF( AND('parent (?x) (?y)', 'parent (?y) (?z)' ), THEN('grandparent (?x) (?z)', 'grandchild (?z) (?x)') )
+
+family_rules = [ rule_id,
+                 rule_brother,
+                 rule_sister,
+                 rule_mother,
+                 rule_father,
+                 rule_son,
+                 rule_daughter,
+                 rule_cousin,
+                 rule_grandparent_grandchild
+                 ]                    # fill me in
 
 # Some examples to try it on:
 # Note: These are used for testing, so DO NOT CHANGE
@@ -201,8 +220,8 @@ TEST_DATA_2 = [ 'female a1', 'female b1', 'female b2',
 TEST_RESULTS_2 = forward_chain(family_rules,
                                TEST_DATA_2, verbose=False)
 
-TEST_RESULTS_6 = forward_chain(family_rules,
-                               simpsons_data,verbose=False)
+## TEST_RESULTS_6 = forward_chain(family_rules,
+##                               simpsons_data,verbose=False)
 
 ## Section 2: Goal trees and backward chaining ##
 
