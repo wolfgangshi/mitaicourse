@@ -15,6 +15,15 @@ from zookeeper import ZOOKEEPER_RULES
 
 
 def backchain_to_goal_tree(rules, hypothesis):
+    """
+    1. Add the hypothesis to an OR tree.
+    2. Read from the rules, match the consequent of each rule against the hypothesis:
+    - If no match, then pass to next rule;
+    - If there is a match, then:
+        - instantiate the antescedent
+        - add the instantiated antescendent, which is a new hypothesis, to the OR tree.
+        - back chaining recursively.
+    """
     raise NotImplementedError
 
 # Here's an example of running the backward chainer - uncomment
