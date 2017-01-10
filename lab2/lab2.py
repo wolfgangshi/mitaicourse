@@ -225,7 +225,11 @@ def a_star(graph, start, goal):
 ## consistent, but not admissible?
 
 def is_admissible(graph, goal):
-    raise NotImplementedError
+    for node in graph.nodes:
+        shortest_path = branch_and_bound(graph, node, goal)
+        if graph.get_heuristic(node, goal) > path_length(graph, shortest_path):
+            return False
+    return True
 
 def is_consistent(graph, goal):
     raise NotImplementedError
