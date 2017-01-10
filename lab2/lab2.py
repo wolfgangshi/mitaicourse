@@ -199,8 +199,25 @@ def branch_and_bound(graph, start, goal):
     return []
 
 def a_star(graph, start, goal):
-    raise NotImplementedError
+    """
+    An A* always use an extended_set
+    """
+    agenda = [[start]]
+    extended_set = set([])
 
+    while agenda:
+        curr_path = agenda.pop()
+        node = curr_path[-1]
+        if node == goal:
+            return curr_path
+        else:
+            if not extended_set.issuperset(set([node])):
+                extended_set.add(node)
+                agenda.extend( [curr_path + [n] for n in graph.get_connected_nodes(node)] )
+                agenda.sort(key = lambda path: path_length(graph, path) + graph.get_heuristic(path[-1], goal), reverse = True)
+
+    ## Failed to find the goal
+    return []
 
 ## It's useful to determine if a graph has a consistent and admissible
 ## heuristic.  You've seen graphs with heuristics that are
