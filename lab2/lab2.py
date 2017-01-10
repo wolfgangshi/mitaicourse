@@ -170,7 +170,12 @@ def _extendForOneLevel(agenda, graph, goal, beam_width):
 ## This function takes in a graph and a list of node names, and returns
 ## the sum of edge lengths along the path -- the total distance in the path.
 def path_length(graph, node_names):
-    raise NotImplementedError
+    length = 0
+    while len(node_names) > 1:
+        length += graph.get_edge(node_names[0], node_names[1]).length
+        node_names = node_names[1:]
+
+    return length
 
 
 def branch_and_bound(graph, start, goal):
