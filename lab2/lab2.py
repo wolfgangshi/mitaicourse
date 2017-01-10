@@ -232,11 +232,15 @@ def is_admissible(graph, goal):
     return True
 
 def is_consistent(graph, goal):
-    raise NotImplementedError
+    for edge in graph.edges:
+        if edge.length < abs( graph.get_heuristic(edge.node1, goal) - graph.get_heuristic(edge.node2, goal) ):
+            return False
+    return True
 
-HOW_MANY_HOURS_THIS_PSET_TOOK = ''
-WHAT_I_FOUND_INTERESTING = ''
-WHAT_I_FOUND_BORING = ''
+
+HOW_MANY_HOURS_THIS_PSET_TOOK = '6'
+WHAT_I_FOUND_INTERESTING = 'Everything'
+WHAT_I_FOUND_BORING = 'None'
 
 def _count():
     i = 0
