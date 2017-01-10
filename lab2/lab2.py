@@ -130,7 +130,6 @@ def beam_search(graph, start, goal, beam_width):
     print 'beam_width = %s' % beam_width
     agenda = [[start]]
     result_path = []
-##    statistics = _count()
 
     while (not result_path):
         if not agenda:
@@ -179,7 +178,25 @@ def path_length(graph, node_names):
 
 
 def branch_and_bound(graph, start, goal):
-    raise NotImplementedError
+    """
+    NOT use extended_set, but reject loop.
+    """
+    agenda = [[start]]
+##    statistics = _count()
+    while agenda:
+        curr_path = agenda.pop() ## list.pop() deletes and returns the last item in the list.
+        node = curr_path[-1]
+        if node == goal:
+            return curr_path
+        else:
+             for n in graph.get_connected_nodes(node):
+##                    print "Enqueued: %s" % statistics.next()
+                 if not set(curr_path).issuperset( set([n]) ):
+                     agenda.append(curr_path + [n])
+                     agenda.sort(key = lambda path: path_length(graph, path), reverse = True)
+
+    ## Failed to find the goal
+    return []
 
 def a_star(graph, start, goal):
     raise NotImplementedError
