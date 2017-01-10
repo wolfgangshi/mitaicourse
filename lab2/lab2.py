@@ -121,7 +121,48 @@ def hill_climbing(graph, start, goal):
 ## The k top candidates are to be determined using the
 ## graph get_heuristic function, with lower values being better values.
 def beam_search(graph, start, goal, beam_width):
-    raise NotImplementedError
+    """ persist: agenda. The agenda in beam search always contain the k-th best paths for a certain length.
+    The algorithm proceeds and extends nodes from the same level (nodes in the agenda) at one time, and update
+    the agenda. During this extension and update:
+    If the goal is reached, return the path leading to the goal;
+    If no goal is found, then extend the path and choose the k-th best if the neighbouring node is neither on the current path nor a dead end.
+    """
+    print 'beam_width = %s' % beam_width
+    agenda = [[start]]
+    result_path = []
+##    statistics = _count()
+
+    while (not result_path):
+        if not agenda:
+            ## fail to find any solution
+            break
+        print "agenda at level %s = %s." % (len(agenda[0]), agenda)
+        agenda, result_path = _extendForOneLevel(agenda, graph, goal, beam_width)
+
+    return result_path
+
+def _extendForOneLevel(agenda, graph, goal, beam_width):
+    """
+    Return a tuple of:
+    1. the agenda (k-th best paths) for the next level, if the goal is not found in this level; otherwise [].
+    2. a result_path when a goal is found, otherwise [].
+    """
+    accumulatedPaths = []
+    while agenda:
+        curr_path = agenda.pop() ## list.pop() deletes and returns the last item in the list.
+        node = curr_path[-1]
+        if node == goal:
+            ## We've found a goal.
+            return [], curr_path
+        else:
+            neighbours = graph.get_connected_nodes(node)
+            for n in neighbours:
+                ## Reject loops and is not and dead end. But we must be careful because a dead end node maybe the goal.
+                if (not set(curr_path).issuperset( set([n]) ) ) and ( graph.get_connected_nodes(n) or n == goal) :
+                    accumulatedPaths.append( curr_path + [n] )
+    accumulatedPaths.sort(key = lambda p: graph.get_heuristic(p[-1], goal), reverse = True )
+
+    return accumulatedPaths[-beam_width:], []
 
 ## Now we're going to try optimal search.  The previous searches haven't
 ## used edge distances in the calculation.
