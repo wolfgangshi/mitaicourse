@@ -82,6 +82,7 @@ quick_to_win_player = lambda board: minimax(board, depth=4,
 ## counting the number of static evaluations you make.
 ##
 ## You can use minimax() in basicplayer.py as an example.
+from numpy import inf
 def alpha_beta_search(board, depth,
                       eval_fn,
                       # NOTE: You should use get_next_moves_fn when generating
@@ -91,7 +92,51 @@ def alpha_beta_search(board, depth,
                       # for connect_four.
                       get_next_moves_fn=get_all_next_moves,
                       is_terminal_fn=is_terminal):
-    raise NotImplementedError
+    _v, move = max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, (-inf, None), (inf, None))
+    return move
+
+def max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
+    if is_terminal_fn(depth, board):
+        return (eval_fn(board), None)
+
+    max_by_far = None
+    for move, new_board in get_next_moves_fn(board):
+        val, _m = min_value(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta)
+
+        ## v = max(v, min_value(...))
+        if max_by_far == None or val > max_by_far[0]:
+            max_by_far = (val, move)
+
+        if beta[0] <= max_by_far[0]:
+            ## 1. The value of the node being examined is no less than v (because v is by far the largest value of the subtrees of this node).
+            ## 2. There is a known beta smaller than v in the upper level of the tree. So the MIN player will never go for this node.
+            ## 3. Thus there is no need to proceed and examine the remaining subtrees for this node
+            return max_by_far
+
+        ## alpha = max(alpha, v) Update the alpha of this node when a subtree is discovered.
+        if alpha[0] < max_by_far[0]:
+            alpha = max_by_far
+    return max_by_far
+
+def min_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
+    if is_terminal_fn(depth, board):
+        return (-1*eval_fn(board), None)
+    min_by_far = None
+    for move, new_board in get_next_moves_fn(board):
+        val, _m = max_value(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta)
+        ## min_by_far = min(min_by_far, max_value(...))
+        if min_by_far == None or val < min_by_far[0]:
+            min_by_far = (val, move)
+
+        ## if alpha > min_by_far, prune!
+        if alpha >= min_by_far[0]:
+            return min_by_far
+
+        ## beta = min(min_by_far, beta)
+        if beta[0] > min_by_far[0]:
+            beta = min_by_far
+
+    return min_by_far
 
 ## Now you should be able to search twice as deep in the same amount of time.
 ## (Of course, this alpha-beta-player won't work until you've defined
