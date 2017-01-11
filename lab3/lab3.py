@@ -14,7 +14,7 @@ from util import INFINITY
 #      1. MM will play better than AB.
 #      2. AB will play better than MM.
 #      3. They will play with the same level of skill.
-ANSWER1 = 0
+ANSWER1 = 3
 
 # 1.2. Two computerized players are playing a game with a time limit. Player MM
 # does minimax search with iterative deepening, and player AB does alpha-beta
@@ -24,7 +24,7 @@ ANSWER1 = 0
 #   1. MM will play better than AB.
 #   2. AB will play better than MM.
 #   3. They will play with the same level of skill.
-ANSWER2 = 0
+ANSWER2 = 2
 
 ### 2. Connect Four
 from connectfour import *
@@ -36,7 +36,7 @@ import tree_searcher
 ## the game interactively. Be sure to re-comment them when you're done with
 ## them.  Please don't turn in a problem set that sits there asking the
 ## grader-bot to play a game!
-## 
+##
 ## Uncomment this line to play a game as white:
 #run_game(human_player, basic_player)
 
@@ -56,9 +56,18 @@ def focused_evaluate(board):
     that board is for the current player.
     A return value >= 1000 means that the current player has won;
     a return value <= -1000 means that the current player has lost
-    """    
-    raise NotImplementedError
-
+    """
+    score = 0
+    if not board.is_game_over():
+        if board.is_win() == board.get_current_player_id():
+            score = 1000
+        elif board.is_win() == board.get_other_player_id():
+            score = -1000
+        else:
+            score = basic_evaluate(board)
+    else:
+        score = -1000
+    return score
 
 ## Create a "player" function that uses the focused_evaluate function
 quick_to_win_player = lambda board: minimax(board, depth=4,
@@ -81,7 +90,7 @@ def alpha_beta_search(board, depth,
                       # The default functions set here will work
                       # for connect_four.
                       get_next_moves_fn=get_all_next_moves,
-		      is_terminal_fn=is_terminal):
+                      is_terminal_fn=is_terminal):
     raise NotImplementedError
 
 ## Now you should be able to search twice as deep in the same amount of time.
@@ -152,7 +161,7 @@ your_player = lambda board: run_search_function(board,
 def run_test_game(player1, player2, board):
     assert isinstance(globals()[board], ConnectFourBoard), "Error: can't run a game using a non-Board object!"
     return run_game(globals()[player1], globals()[player2], globals()[board])
-    
+
 def run_test_search(search, board, depth, eval_fn):
     assert isinstance(globals()[board], ConnectFourBoard), "Error: can't run a game using a non-Board object!"
     return globals()[search](globals()[board], depth=depth,
@@ -165,7 +174,7 @@ def run_test_tree_search(search, board, depth):
                              eval_fn=tree_searcher.tree_eval,
                              get_next_moves_fn=tree_searcher.tree_get_next_move,
                              is_terminal_fn=tree_searcher.is_leaf)
-    
+
 ## Do you want us to use your code in a tournament against other students? See
 ## the description in the problem set. The tournament is completely optional
 ## and has no effect on your grade.
@@ -177,4 +186,3 @@ WHAT_I_FOUND_INTERESTING = ""
 WHAT_I_FOUND_BORING = ""
 NAME = ""
 EMAIL = ""
-
