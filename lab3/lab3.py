@@ -2,7 +2,7 @@
 # Name: <Your Name>
 # Email: <Your Email>
 
-from util import INFINITY
+from util import INFINITY, NEG_INFINITY
 
 ### 1. Multiple choice
 
@@ -82,7 +82,6 @@ quick_to_win_player = lambda board: minimax(board, depth=4,
 ## counting the number of static evaluations you make.
 ##
 ## You can use minimax() in basicplayer.py as an example.
-from numpy import inf
 def alpha_beta_search(board, depth,
                       eval_fn,
                       # NOTE: You should use get_next_moves_fn when generating
@@ -92,7 +91,7 @@ def alpha_beta_search(board, depth,
                       # for connect_four.
                       get_next_moves_fn=get_all_next_moves,
                       is_terminal_fn=is_terminal):
-    _v, move = max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, (-inf, None), (inf, None))
+    _v, move = max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, (NEG_INFINITY, None), (INFINITY, None))
     return move
 
 def max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
@@ -158,18 +157,31 @@ ab_iterative_player = lambda board: \
 ## simple-evaluate (or focused-evaluate) while searching to the
 ## same depth.
 
+## Another stronger evaluation function can be built using the concept of threats.
+## Threat is a square that connects 4 when a tile is dropped there by the opponent.
+## You can simply return the difference in the number of threats by each player, but we can do much better by actually filtering useless threats (like a threat just above an opponents threat, or all threats above a threat by both players) and even assigning bonus for some threats (like lowermost threat of a column or 2 consecutive threats by the same player).
+## -- From a comment of the post on http://stackoverflow.com/questions/10985000/how-should-i-design-a-good-evaluation-function-for-connect-4
+
 def better_evaluate(board):
+#    current_player_id = board.get_current_player_id()
+#    if board.is_game_over():
+#        score = -10000
+#    elif board.is_win() == current_player_id:
+#        score = 10000
+#    elif board.is_win():
+#        score = -10000
+#    else:
     raise NotImplementedError
 
 # Comment this line after you've fully implemented better_evaluate
-better_evaluate = memoize(basic_evaluate)
+better_evaluate = memoize(better_evaluate)
 
 # Uncomment this line to make your better_evaluate run faster.
 # better_evaluate = memoize(better_evaluate)
 
 # For debugging: Change this if-guard to True, to unit-test
 # your better_evaluate function.
-if False:
+if True:
     board_tuples = (( 0,0,0,0,0,0,0 ),
                     ( 0,0,0,0,0,0,0 ),
                     ( 0,0,0,0,0,0,0 ),
