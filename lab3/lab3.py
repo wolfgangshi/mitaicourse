@@ -59,14 +59,15 @@ def focused_evaluate(board):
     """
     score = 0
     if not board.is_game_over():
+#        print " Not over yet "
+        score = basic_evaluate(board)
+    else:
         if board.is_win() == board.get_current_player_id():
+#            print " Current win "
             score = 1000
         elif board.is_win() == board.get_other_player_id():
+#            print " Opponent win "
             score = -1000
-        else:
-            score = basic_evaluate(board)
-    else:
-        score = -1000
     return score
 
 ## Create a "player" function that uses the focused_evaluate function
@@ -91,51 +92,67 @@ def alpha_beta_search(board, depth,
                       # for connect_four.
                       get_next_moves_fn=get_all_next_moves,
                       is_terminal_fn=is_terminal):
-    _v, move = max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, (NEG_INFINITY, None), (INFINITY, None))
-    return move
 
-def max_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
-    if is_terminal_fn(depth, board):
-        return (eval_fn(board), None)
+    return alpha_beta_search_aux(board,
+                                 depth,
+                                 eval_fn,
+                                 get_next_moves_fn,
+                                 is_terminal_fn,
+                                 NEG_INFINITY,
+                                 INFINITY)
 
-    max_by_far = None
+def  alpha_beta_search_aux(board, depth, eval_fn,
+                           get_next_moves_fn,
+                           is_terminal_fn,
+                           alpha, beta):
+    best_val = None
+
     for move, new_board in get_next_moves_fn(board):
-        val, _m = min_value(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta)
+        val = -1 * ab_minimax_find_board_value(new_board, depth - 1, eval_fn, get_next_moves_fn, is_terminal_fn, negate(beta), negate(alpha))
 
-        ## v = max(v, min_value(...))
-        if max_by_far == None or val > max_by_far[0]:
-            max_by_far = (val, move)
+        ## We always want to maximize our own utility. The current player's utility is valued by the negate of
+        ##  the opponent's utility in this zero sum game.
+        if best_val == None or val > best_val[0]:
+            best_val = (val, move, new_board)
 
-        if beta[0] <= max_by_far[0]:
-            ## 1. The value of the node being examined is no less than v (because v is by far the largest value of the subtrees of this node).
-            ## 2. There is a known beta smaller than v in the upper level of the tree. So the MIN player will never go for this node.
-            ## 3. Thus there is no need to proceed and examine the remaining subtrees for this node
-            return max_by_far
+        # Pruning won't happen at the root.
 
-        ## alpha = max(alpha, v) Update the alpha of this node when a subtree is discovered.
-        if alpha[0] < max_by_far[0]:
-            alpha = max_by_far
-    return max_by_far
+        # Update the value of alpha
+        if alpha < val :
+            alpha = val
 
-def min_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
+    #if verbose:
+    print "ALPHA-BETA: Decided on column %s with rating %s" % (best_val[1], best_val[0])
+
+    return best_val[1]
+
+def ab_minimax_find_board_value(board, depth, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta):
+
+    best_val = None
+
     if is_terminal_fn(depth, board):
-        return (-1*eval_fn(board), None)
-    min_by_far = None
+        return eval_fn(board)
+
     for move, new_board in get_next_moves_fn(board):
-        val, _m = max_value(new_board, depth-1, eval_fn, get_next_moves_fn, is_terminal_fn, alpha, beta)
-        ## min_by_far = min(min_by_far, max_value(...))
-        if min_by_far == None or val < min_by_far[0]:
-            min_by_far = (val, move)
+        val = -1 * ab_minimax_find_board_value(new_board, depth - 1, eval_fn, get_next_moves_fn, is_terminal_fn, negate(beta), negate(alpha))
+        if best_val == None or val > best_val:
+            best_val = val
 
-        ## if alpha > min_by_far, prune!
-        if alpha >= min_by_far[0]:
-            return min_by_far
+        # Update the value of alpha
+        alpha = max(alpha, val)
 
-        ## beta = min(min_by_far, beta)
-        if beta[0] > min_by_far[0]:
-            beta = min_by_far
+        if alpha >= beta:
+            return alpha
 
-    return min_by_far
+    return val
+
+def negate(n):
+    if n == INFINITY:
+        return NEG_INFINITY
+    elif n == NEG_INFINITY:
+        return INFINITY
+    else:
+        return -n
 
 ## Now you should be able to search twice as deep in the same amount of time.
 ## (Of course, this alpha-beta-player won't work until you've defined
@@ -162,16 +179,47 @@ ab_iterative_player = lambda board: \
 ## You can simply return the difference in the number of threats by each player, but we can do much better by actually filtering useless threats (like a threat just above an opponents threat, or all threats above a threat by both players) and even assigning bonus for some threats (like lowermost threat of a column or 2 consecutive threats by the same player).
 ## -- From a comment of the post on http://stackoverflow.com/questions/10985000/how-should-i-design-a-good-evaluation-function-for-connect-4
 
+
+
 def better_evaluate(board):
-#    current_player_id = board.get_current_player_id()
-#    if board.is_game_over():
-#        score = -10000
-#    elif board.is_win() == current_player_id:
-#        score = 10000
-#    elif board.is_win():
-#        score = -10000
-#    else:
-    raise NotImplementedError
+    current_player_id = board.get_current_player_id()
+    score = 0
+    if board.is_game_over():
+        score = -1000
+    elif board.is_win() == current_player_id:
+        score = 1000
+    elif board.is_win():
+        score = -1000
+    else:
+        score = basic_evaluate(board)
+        t1 = find_threats(board, board.get_current_player_id())
+        t2 = find_threats(board, board.get_other_player_id())
+
+        n_t1, n_t2 = filter_threats(t1, t2)
+        score += (len(n_t1) - len(n_t2))
+    return score
+
+def find_threats(board, player_id):
+    """
+    Find all threats on the board for the specified player.
+    Threat is a square that connects 4 when a tile is dropped there by the opponent.
+    Return a set of cells that are threats.
+    """
+    for chain in board.chain_cells(player_id):
+        print " chain cells for %s: %s" % (player_id, chain)
+        pass
+    return set([])
+
+def filter_threats(threat_set_1, threat_set_2):
+    """
+    threat_set_1, threat_set_2: the sets of threat cells to be filtered.
+    The rules are:
+    1. If a threat just above an opponents threat;
+    2. all threats above a threat by both players.
+
+    returns tuple (filtered_threat_set_1, filtered_threat_set_2)
+    """
+    return (set([]), set([]))
 
 # Comment this line after you've fully implemented better_evaluate
 better_evaluate = memoize(better_evaluate)
