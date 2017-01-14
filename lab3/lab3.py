@@ -109,6 +109,7 @@ def alpha_beta_search_aux(board, depth, eval_fn,
     for move, new_board in get_next_moves_fn(board):
         val = -1 * ab_minimax_find_board_value(new_board, depth - 1, eval_fn, get_next_moves_fn, is_terminal_fn, negate(beta), negate(alpha))
 #       print "val: %s, move: %s, new_board: %s" % (val, move, new_board)
+
         ## We always want to maximize our own utility. The current player's utility is valued by the negate of
         ##  the opponent's utility in this zero sum game.
         if best_val == None or val > best_val[0]:
@@ -345,9 +346,9 @@ def weighted_threats(board, threat_set_1, threat_set_2):
         if t[0] == board.board_height - 1:
             return 10
         elif _is_cell_occupied(board, _below(t) ):
-            return 10
+            return 20
         else:
-            return 1
+            return 10
 
     for t in threat_set_1:
         weighted_threat_value_1 += _weigh(board, t)
