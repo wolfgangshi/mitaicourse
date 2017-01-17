@@ -16,8 +16,32 @@ def forward_checking(state, verbose=False):
         return False
 
     # Add your forward checking logic here.
-    
-    raise NotImplementedError
+    # 1. Find X = x being the current assignment.
+    # 2. for each Y that is associated with X in a binary constraint; do
+    #        for each y in Y's Domain; do
+    #            if X=x and Y=y don't hold:
+    #                 remove y from Y's Domain
+    #                 if Y's Domain is empty:
+    #                    return False
+    #    return True
+
+    # NOTE: This function is not a pure function. Its side-effect is
+    #       to update the state
+    curr_var_name = state.get_current_variable_name()
+    if not curr_var_name:
+        # ROOT
+        return True
+
+    for constraint in state.get_constraints_by_name(curr_var_name):
+        var_j = state.get_variable_by_name( constraint.get_variable_j_name() )
+        for val in var_j.get_domain():
+            if not constraint.check(state, value_i = None, value_j = val):
+                var_j.reduce_domain(val)
+
+            if var_j.domain_size() ==  0:
+                return False
+
+    return True
 
 # Now Implement forward checking + (constraint) propagation through
 # singleton domains.
@@ -28,7 +52,26 @@ def forward_checking_prop_singleton(state, verbose=False):
         return False
 
     # Add your propagate singleton logic here.
-    raise NotImplementedError
+    singleton_queue = [ var for var in state.get_all_variables() if var.domain_size() == 1 ]
+    visited_singletons = set([])
+
+    while singleton_queue:
+        var = singleton_queue.pop(0)
+
+        visited_singletons.add(var)
+        for constraint in state.get_constraints_by_name(var.get_name()):
+            var_j = state.get_variable_by_name( constraint.get_variable_j_name() )
+            for val_j in var_j.get_domain():
+                if not constraint.check(state, var.get_domain()[0], val_j):
+                    var_j.reduce_domain(val_j)
+
+                if var_j.domain_size() == 0:
+                    return False
+
+            if var_j.domain_size() == 1 and not visited_singletons.issuperset(set([var_j])):
+                singleton_queue.append(var_j)
+
+    return True
 
 ## The code here are for the tester
 ## Do not change.
@@ -112,11 +155,11 @@ def limited_house_classifier(house_people, house_votes, n, verbose = False):
         print CongressIDTree(house_limited_group2, house_limited_votes,
                              information_disorder)
         print
-        
+
     return evaluate(idtree_maker(house_limited_votes, information_disorder),
                     house_limited_group1, house_limited_group2)
 
-                                   
+
 ## Find a value of n that classifies at least 430 representatives correctly.
 ## Hint: It's not 10.
 N_1 = 10
@@ -145,5 +188,3 @@ def eval_test(eval_fn, group1, group2, verbose = 0):
         return evaluate(globals()[eval_fn], group1, group2, verbose)
     else:
         raise Exception, "Error: Tester tried to use an invalid evaluation function: '%s'" % eval_fn
-
-    
