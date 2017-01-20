@@ -112,8 +112,13 @@ senate_group1, senate_group2 = crosscheck_groups(senate_people)
 ## computes Hamming distances.
 
 def euclidean_distance(list1, list2):
-    # this is not the right solution!
-    return hamming_distance(list1, list2)
+    assert isinstance(list1, list)
+    assert isinstance(list2, list)
+
+    distance = 0
+    for item1, item2 in zip(list1, list2):
+        distance += (item1 - item2) ** 2
+    return pow(distance, 0.5)
 
 #Once you have implemented euclidean_distance, you can check the results:
 #evaluate(nearest_neighbors(euclidean_distance, 1), senate_group1, senate_group2)
