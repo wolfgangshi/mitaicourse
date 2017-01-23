@@ -121,7 +121,7 @@ def euclidean_distance(list1, list2):
     return pow(distance, 0.5)
 
 #Once you have implemented euclidean_distance, you can check the results:
-#evaluate(nearest_neighbors(euclidean_distance, 1), senate_group1, senate_group2)
+#evaluate(nearest_neighbors(euclidean_distance, 1), senate_group1, senate_group2, verbose=2)
 
 ## By changing the parameters you used, you can get a classifier factory that
 ## deals better with independents. Make a classifier that makes at most 3
@@ -137,7 +137,25 @@ my_classifier = nearest_neighbors(hamming_distance, 1)
 ## which should lead to simpler trees.
 
 def information_disorder(yes, no):
-    return homogeneous_disorder(yes, no)
+    ## Neither the yes group nor the no group should be of length 0
+    discord = 0
+    l, r = len(yes), len(no)
+    T = float(l + r)
+
+    for branch, branch_num in ( (yes, l), (no, r) ):
+        classes = {}
+        for key in branch:
+            if not classes.has_key(key):
+                classes[key] = 1
+            else:
+                classes[key] += 1
+
+        for class_num in classes.itervalues():
+            ratio = class_num / float(branch_num)
+            branch_weight = branch_num / T
+            discord -= branch_weight * ratio * math.log(ratio, 2)
+
+    return discord
 
 #print CongressIDTree(senate_people, senate_votes, information_disorder)
 #evaluate(idtree_maker(senate_votes, homogeneous_disorder), senate_group1, senate_group2)
@@ -193,3 +211,6 @@ def eval_test(eval_fn, group1, group2, verbose = 0):
         return evaluate(globals()[eval_fn], group1, group2, verbose)
     else:
         raise Exception, "Error: Tester tried to use an invalid evaluation function: '%s'" % eval_fn
+
+if __name__ == '__main__':
+    assert(1.0 == information_disorder(['Democrat','Republican'], ['Democrat',"Republican"]))
