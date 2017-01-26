@@ -152,8 +152,7 @@ def information_disorder(yes, no):
 
         for class_num in classes.itervalues():
             ratio = class_num / float(branch_num)
-            branch_weight = branch_num / T
-            discord -= branch_weight * ratio * math.log(ratio, 2)
+            discord -= (class_num / T) * math.log(ratio, 2)
 
     return discord
 
@@ -185,15 +184,15 @@ def limited_house_classifier(house_people, house_votes, n, verbose = False):
 
 ## Find a value of n that classifies at least 430 representatives correctly.
 ## Hint: It's not 10.
-N_1 = 10
+N_1 = 44
 rep_classified = limited_house_classifier(house_people, house_votes, N_1)
 
 ## Find a value of n that classifies at least 90 senators correctly.
-N_2 = 10
+N_2 = 67
 senator_classified = limited_house_classifier(senate_people, senate_votes, N_2)
 
 ## Now, find a value of n that classifies at least 95 of last year's senators correctly.
-N_3 = 10
+N_3 = 23
 old_senator_classified = limited_house_classifier(last_senate_people, last_senate_votes, N_3)
 
 
