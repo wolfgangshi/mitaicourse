@@ -452,13 +452,25 @@ def make_neural_net_with_weights():
     # You can preset weights for the network by completing
     # and uncommenting the init_weights dictionary below.
     #
-    # init_weights = { 'w1A' : 0.0,
-    #                  'w2A' : 0.0,
-    #                  'w1B' : 0.0,
-    #                  'w2B' : 0.0,
-    #                  .... # finish me!
-    #
-    raise NotImplementedError, "Implement me!"
+    init_weights = {'w1A': 1.0,
+                    'w2A': 1.0,
+                    'wA': 6.0,
+                    'w1B': -1.0,
+                    'w2B': -1.0,
+                    'wB': -2.0,
+                    'w1C': -1.0,
+                    'w2C': 1.0,
+                    'wC': -2.0,
+                    'w1D': 1.0,
+                    'w2D': -1.0,
+                    'wD': -2,
+                    'wAE': 2,
+                    'wBE': 2,
+                    'wCE': 1,
+                    'wDE': 1,
+                    'wE': 3,
+        }
+
     return make_net_with_init_weights_from_dict(make_neural_net_challenging,
                                                 init_weights)
 
