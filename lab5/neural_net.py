@@ -403,8 +403,43 @@ def make_neural_net_challenging():
     See 'make_neural_net_basic' for required naming convention for inputs,
     weights, and neurons.
     """
+    i0 = Input('i0', -1.0) # this input is immutable
+    i1 = Input('i1', 0.0)
+    i2 = Input('i2', 0.0)
 
-    raise NotImplementedError, "Implement me!"
+    seed_random()
+    w1A = Weight('w1A', random_weight())
+    w2A = Weight('w2A', random_weight())
+    wA  = Weight('wA', random_weight())
+
+    w1B = Weight('w1B', random_weight())
+    w2B = Weight('w2B', random_weight())
+    wB  = Weight('wB', random_weight())
+
+    w1C = Weight('w1C', random_weight())
+    w2C = Weight('w2C', random_weight())
+    wC = Weight('wC', random_weight())
+
+    w1D = Weight('w1D', random_weight())
+    w2D = Weight('w2D', random_weight())
+    wD = Weight('wD', random_weight())
+
+    wAE = Weight('wAE', random_weight())
+    wBE = Weight('wBE', random_weight())
+    wCE = Weight('wCE', random_weight())
+    wDE = Weight('wDE', random_weight())
+    wE = Weight('wE', random_weight())
+
+    A = Neuron('A', [i1, i2, i0], [w1A, w2A, wA])
+    B = Neuron('B', [i1, i2, i0], [w1B, w2B, wB])
+    C = Neuron('C', [i1, i2, i0], [w1C, w2C, wC])
+    D = Neuron('D', [i1, i2, i0], [w1D, w2D, wD])
+    E = Neuron('E', [A, B, C, D, i0], [wAE, wBE, wCE, wDE, wE])
+
+    P = PerformanceElem(E, 0.0)
+    net = Network(P, [A, B, C, D, E])
+
+    return net
 
 def make_neural_net_with_weights():
     """
@@ -438,7 +473,6 @@ def make_net_with_init_weights_from_list(net_fn,init_weights):
     for i in range(len(net.weights)):
         net.weights[i].set_value(init_weights[i])
     return net
-
 
 def abs_mean(values):
     """Compute the mean of the absolute values a set of numbers.
