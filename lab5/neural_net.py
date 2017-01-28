@@ -57,21 +57,21 @@ class Input(ValuedElement,DifferentiableElement):
     def output(self):
         """
         Returns the output of this Input node.
-        
+
         returns: number (float or int)
         """
-        raise NotImplementedError, "Implement me!"
+        return self.get_value()
 
     def dOutdX(self, elem):
         """
-        Returns the derivative of this Input node with respect to 
+        Returns the derivative of this Input node with respect to
         elem.
 
         elem: an instance of Weight
 
         returns: number (float or int)
         """
-        raise NotImplementedError, "Implement me!"
+        return 0
 
 class Weight(ValuedElement):
     """
@@ -82,6 +82,7 @@ class Weight(ValuedElement):
         self.next_value = None
 
     def set_next_value(self,val):
+#        print "%s's next value: %s" % (self, val)
         self.next_value = val
 
     def update(self):
@@ -170,7 +171,12 @@ class Neuron(DifferentiableElement):
 
         returns: number (float or int)
         """
-        raise NotImplementedError, "Implement me!"
+        ## output = sumof(input[i] * input_weight[i]), for each input and input_weight.
+        z = 0
+        for i in range( len(self.my_inputs) ):
+            z += self.my_inputs[i].output() * self.my_weights[i].get_value()
+
+        return 1.0 / (1.0 + math.e**(-z))
 
     def dOutdX(self, elem):
         # Implement compute_doutdx instead!!
@@ -190,7 +196,31 @@ class Neuron(DifferentiableElement):
 
         returns: number (float/int)
         """
-        raise NotImplementedError, "Implement me!"
+        ## See MIT6_034F10_tutor04.pdf for the full discussion about how to implement the dOutdX function.
+
+        ## out is the result of the sigmoid function taking z as an input. Thus dout / dz is out * ( 1 - out)
+        out = self.output()
+        doutdz = out * (1 - out)
+
+        ## Case 1: [elem] is a weight directly connected into this neuron.
+        ## dout / dx = (dout / dz) * (dz / dx)
+        if self.has_weight(elem):
+            for i in xrange( len(self.my_weights) ):
+                if elem.get_name() == self.my_weights[i].get_name():
+                    return doutdz * self.my_inputs[i].output()
+
+        ## Case 2: When [elem] is a weight that is not directly connected.
+        ### You may also further break case-2 down into two subcases:
+        ### a) weights that are descendants of (or downstream from) the current node
+        ### b) weights that are not downstream from the current node (in which case their ultimate derivative value should be 0.)
+        dzdx = 0
+        for i in  xrange( len(self.my_weights) ):
+            if self.isa_descendant_weight_of( elem, self.my_weights[i] ):
+                ## print "calculating dOutdX for %(self)s on %(elem)s through %(weight)s" % {'self':self, 'elem':elem, 'weight':self.my_weights[i]}
+                dzdx += self.my_weights[i].get_value() * self.my_inputs[i].dOutdX(elem)
+
+        return doutdz * dzdx
+
 
     def get_weights(self):
         return self.my_weights
@@ -222,10 +252,10 @@ class PerformanceElem(DifferentiableElement):
     def output(self):
         """
         Returns the output of this PerformanceElem node.
-        
+
         returns: number (float/int)
         """
-        raise NotImplementedError, "Implement me!"
+        return - 0.5 * ( self.my_desired_val - self.my_input.output() ) ** 2
 
     def dOutdX(self, elem):
         """
@@ -236,7 +266,10 @@ class PerformanceElem(DifferentiableElement):
 
         returns: number (int/float)
         """
-        raise NotImplementedError, "Implement me!"
+        ##        dP/d(w) = dP/do  * do/dw         # applying the chain rule
+        ##        = (d-o)  * o.dOutdX(w)
+
+        return ( self.my_desired_val - self.my_input.output() ) * self.my_input.dOutdX(elem)
 
     def set_desired(self,new_desired):
         self.my_desired_val = new_desired
@@ -278,11 +311,11 @@ def seed_random():
 
 def random_weight():
     """Generate a deterministic random weight"""
-    # We found that random.randrange(-1,2) to work well emperically 
+    # We found that random.randrange(-1,2) to work well emperically
     # even though it produces randomly 3 integer values -1, 0, and 1.
     return random.randrange(-1, 2)
 
-    # Uncomment the following if you want to try a uniform distribuiton 
+    # Uncomment the following if you want to try a uniform distribuiton
     # of random numbers compare and see what the difference is.
     # return random.uniform(-1, 1)
 
@@ -335,7 +368,31 @@ def make_neural_net_two_layer():
     See 'make_neural_net_basic' for required naming convention for inputs,
     weights, and neurons.
     """
-    raise NotImplementedError, "Implement me!"
+    i0 = Input('i0', -1.0) # this input is immutable
+    i1 = Input('i1', 0.0)
+    i2 = Input('i2', 0.0)
+
+    seed_random()
+    w1A = Weight('w1A', random_weight())
+    w2A = Weight('w2A', random_weight())
+    wA  = Weight('wA', random_weight())
+
+    w1B = Weight('w1B', random_weight())
+    w2B = Weight('w2B', random_weight())
+    wB  = Weight('wB', random_weight())
+
+    wAC = Weight('wAC', random_weight())
+    wBC = Weight('wBC', random_weight())
+    wC = Weight('wC', random_weight())
+
+    A = Neuron('A', [i1, i2, i0], [w1A, w2A, wA])
+    B = Neuron('B', [i1, i2, i0], [w1B, w2B, wB])
+    C = Neuron('C', [A, B, i0], [wAC, wBC, wC])
+
+    P = PerformanceElem(C, 0.0)
+    net = Network(P, [A, B, C])
+
+    return net
 
 def make_neural_net_challenging():
     """
@@ -393,7 +450,7 @@ def abs_mean(values):
 
 def train(network,
           data,      # training data
-          rate=1.0,  # learning rate
+          rate=1,  # learning rate
           target_abs_mean_performance=0.0001,
           max_iterations=10000,
           verbose=False):
@@ -479,3 +536,34 @@ def test(network, data, verbose=False):
                                                            "wrong")
 
     return float(correct)/len(data)
+
+if __name__ == '__main__':
+    def test_simple_network():
+            i0 = Input('i0', -1.0) # this input is immutable
+            i1 = Input('i1', 0.0)
+            i2 = Input('i2', 0.0)
+
+            w1A = Weight('w1A', 0)
+            w2A = Weight('w2A', 0)
+            wA  = Weight('wA', 1)
+
+            # Inputs must be in the same order as their associated weights
+            A = Neuron('A', [i1,i2,i0], [w1A,w2A,wA])
+            P = PerformanceElem(A, 0.0)
+
+            net = Network(P,[A])
+            return net
+
+    test_simple_network = test_simple_network()
+    train(test_simple_network,
+    [ [0.0, 0.0, 1.0],
+      [0.0, 1.0, 1.0],
+
+    ],
+#    target_abs_mean_performance = 0.5,
+    max_iterations=1,
+    verbose = True)
+
+    test(test_simple_network, [ [1.0, 0.0] ], True)
+
+    make_neural_net_two_layer()
