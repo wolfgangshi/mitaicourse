@@ -107,7 +107,7 @@ class BaseVoteClassifier(Classifier):
         vote = vote_info(self.votelist[self.index])
         if self.value == 1: direction = 'YES'
         else: direction = 'NO'
-        return "%s on %s" % (direction, vote)
+        return "%s on %s(%s)" % (direction, vote, self.index)
     def __repr__(self):
         return "<BaseVoteClassifier: %s>" % self
 
@@ -143,7 +143,7 @@ class BoostClassifier(Classifier):
         correct class for a data point.
         """
         self.base_classifiers = base_classifiers
-        self.data = data 
+        self.data = data
         self.data_weights = [1.0/len(data) for d in data]
         self.classifiers = []
         self.standard = standard
@@ -161,8 +161,12 @@ class BoostClassifier(Classifier):
 
         returns: int (+1 or -1)
         """
-        # Fill me in! (the answer given is not correct!)
-        return 1
+        f = 0
+        for (classifier, alpha) in self.classifiers:
+            f += classifier.classify(obj) * alpha
+
+        return 1 if f > 0 else -1
+
 
     def orange_classify(self, obj):
         """
@@ -266,8 +270,13 @@ class BoostClassifier(Classifier):
 
         returns: Nothing (only updates self.data_weights)
         """
-        # Fill me in!
-        pass
+        for i in xrange( len(self.data_weights) ):
+            datum = self.data[i]
+            dweight = self.data_weights[i]
+            if best_classifier.classify(datum) == self.standard.classify(datum):
+                self.data_weights[i] = dweight / (2 * (1 - best_error) )
+            else:
+                self.data_weights[i] = dweight / (2 * best_error)
 
     def __str__(self):
         classifier_part = '\n'.join(["%4.4f: %s" % (weight, c) for c, weight in

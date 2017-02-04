@@ -25,7 +25,6 @@ last_senate_votes = read_vote_data('S109desc.csv')
 house_1796 = read_congress_data('H004.ord')
 house_1796_votes = read_vote_data('H004desc.csv')
 
-
 # The first step is to complete the boosting code in boost.py. None of the
 # following steps will work without it.
 #
@@ -44,7 +43,18 @@ boost_1796.train(20)
 # does it predict a Republican would vote on the amendment to require
 # "newspapers to be sufficiently dried before mailing"? ('yes' or 'no')
 
-republican_newspaper_vote = 'answer yes or no'
+def republican_vote_pred(boost, vote_id):
+    for (c, a) in boost.classifiers:
+        if c.index == vote_id and c.value * a > 0:
+            return 'yes'
+        elif c.index == vote_id and c.value * a <= 0:
+            return 'no'
+        else:
+            pass
+    return None
+
+
+republican_newspaper_vote = republican_vote_pred(boost_1796, 80)
 
 # In the 4th House of Representatives, which five representatives were
 # misclassified the most while training your boost classifier?
@@ -69,7 +79,13 @@ def most_misclassified(classifier, n=5):
 	returns: list of data points (each passed through legislator_info) that were
 			 misclassified most often
     """
-    raise NotImplementedError
+    ## most misclassified ==  largest final data weight
+    classifier.renormalize_weights()
+
+    from operator import itemgetter
+    sorted_data_weight_list = sorted(zip(classifier.data, classifier.data_weights), key=itemgetter(1), reverse=True)
+    return [ legislator_info(legislator) for (legislator, w) in sorted_data_weight_list[:n] ]
+
 
 # The following line is used by the tester; please leave it in place!
 most_misclassified_boost_1796 = lambda n: most_misclassified(boost_1796, n)
@@ -83,7 +99,7 @@ most_misclassified_boost_1796 = lambda n: most_misclassified(boost_1796, n)
 boost = BoostClassifier(make_vote_classifiers(senate_votes), senate_people,
   standardPartyClassifier)
 boost.train(20)
-republican_sunset_vote = 'answer yes or no'
+republican_sunset_vote = republican_vote_pred(boost, 448)
 
 # Which five Senators are the most misclassified after training your
 # classifier? (Again, the tester will test the function, not the answer you
