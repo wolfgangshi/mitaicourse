@@ -1,3 +1,4 @@
+
 #
 # 6.034 Fall 2010 lab 5
 # Name:
@@ -226,33 +227,33 @@ if __name__ == "__main__":
 
 # For the vampire dataset, what variable does the id tree query, that our
 # algorithm in class did not?
-vampires_idtree_odd = "one of: shadow garlic complexion accent"
+vampires_idtree_odd = 'accent' ##"one of: shadow garlic complexion accent"
 
 # For the vampire dataset, which classifier does the worst when tested on just
 # the data on which it was trained?
-vampires_worst_on_training = 'one of: maj dt knn svml svmp3 svmr svms nb'
+vampires_worst_on_training = 'svmr' ##'one of: maj dt knn svml svmp3 svmr svms nb'
 # Is it actually doing badly, or is it just confused?
 
 # For the vampire dataset, which classifier does the worst when cross-validated?
-vampires_worst_on_test = 'one of: maj dt knn svml svmp3 svmr svms nb'
+vampires_worst_on_test = 'svms' ##'one of: maj dt knn svml svmp3 svmr svms nb'
 
 
 # Which of the above classifiers has the best Brier distance to the true answers
 # in ten-fold cross-validation for the H004 dataset?
 
-best_brier_for_h004 = 'one of: maj dt knn svml svmp3 svmr svms nb'
+best_brier_for_h004 = 'svmp3' ##'one of: maj dt knn svml svmp3 svmr svms nb'
 
 # Just looking at the confusion matrices, what is the minimum number
 # of data points that must have been differently classified between
 # the best classifier and the second-best classifier for the H004 data
 # set?
 
-min_disagreement_h004 = None
+min_disagreement_h004 = 2
 
 # Which bill was the most divisive along party lines in the H004 data
 # set, according to the classification tree (id tree)?
 
-most_divisive_h004 = 'a bill number'
+most_divisive_h004 = '2' ##'a bill number'
 
 
 
@@ -292,8 +293,8 @@ DATASET_STANDARDS={
     }
 
 if __name__ == "__main__":
-    dataset = "H004"
-
+#    dataset = "H004"
+    dataset = "breast-cancer"
     describe_and_classify(dataset, learners)
     print "Boosting with our suite of orange classifiers:"
     print ("  accuracy: %.3f, brier: %.3f, auc: %.3f" %
@@ -304,8 +305,8 @@ if __name__ == "__main__":
 # will give you the best cross-validation accuracy on the breast-cancer
 # dataset?
 
-classifiers_for_best_ensemble = ['maj', 'dt', 'knn', 'svml',
-                                 'svmp3', 'svmr', 'svms', 'nb']
+classifiers_for_best_ensemble = ['svml', 'svmp3', 'svmr', 'svms', 'nb']
+## a subset of ['maj', 'dt', 'knn', 'svml', 'svmp3', 'svmr', 'svms', 'nb']
 
 
 
